@@ -1,6 +1,9 @@
 package config
 
 import (
+	"os"
+	"time"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
@@ -8,6 +11,13 @@ import (
 // LoggerConfig returns Fiber Logger middleware configuration.
 func LoggerConfig() fiber.Handler {
 	return logger.New(logger.Config{
-		Format: "[${ip}]:${port} ${status} - ${method} ${path}\n", // Log format
+		Next:          nil,
+		Done:          nil,
+		Format:        "${time} | ${status} | ${latency} | ${ip} | ${method} | ${path} | ${error}\n",
+		TimeFormat:    "01/02/2006 15:04:05",
+		TimeZone:      "Asia/Jakarta",
+		TimeInterval:  500 * time.Millisecond,
+		Output:        os.Stdout,
+		DisableColors: false,
 	})
 }

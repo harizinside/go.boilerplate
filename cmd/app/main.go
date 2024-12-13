@@ -36,7 +36,11 @@ func main() {
 	rdb := config.GetRedisClient()
 	log.Printf("Redis connected")
 
-	app := fiber.New()
+	app := config.FiberConfig()
+
+	app.Use(config.RecoverConfig())
+
+	app.Use(config.RequestIDConfig())
 
 	app.Use(config.LoggerConfig())
 

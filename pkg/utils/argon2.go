@@ -53,9 +53,12 @@ func HashPassword(password string) (string, error) {
 
 // VerifyPassword compares a plain-text password against a stored hash.
 func VerifyPassword(password, encodedHash string) (bool, error) {
-	// Split the encoded hash into parts
+	// Trim leading/trailing spaces and normalize the format
+	encodedHash = strings.TrimSpace(encodedHash)
+
+	// Ensure correct format by splitting into parts
 	parts := strings.Split(encodedHash, "$")
-	if len(parts) != 6 {
+	if len(parts) != 8 {
 		return false, errors.New("invalid hash format")
 	}
 
@@ -66,27 +69,33 @@ func VerifyPassword(password, encodedHash string) (bool, error) {
 		return false, errors.New("invalid Argon2 version")
 	}
 
-	_, err = fmt.Sscanf(parts[3], "t=%d", &time)
+	var t, m uint32
+	var p uint8
+	_, err = fmt.Sscanf(parts[3], "t=%d", &t)
 	if err != nil {
 		return false, err
 	}
-	_, err = fmt.Sscanf(parts[4], "m=%d", &memory)
+	_, err = fmt.Sscanf(parts[4], "m=%d", &m)
+	if err != nil {
+		return false, err
+	}
+	_, err = fmt.Sscanf(parts[5], "p=%d", &p)
 	if err != nil {
 		return false, err
 	}
 
 	// Decode salt and hash
-	salt, err := base64.RawStdEncoding.DecodeString(parts[5])
+	salt, err := base64.RawStdEncoding.DecodeString(parts[6])
 	if err != nil {
-		return false, err
+		return false, errors.New("invalid salt encoding")
 	}
-	expectedHash, err := base64.RawStdEncoding.DecodeString(parts[6])
+	expectedHash, err := base64.RawStdEncoding.DecodeString(parts[7])
 	if err != nil {
-		return false, err
+		return false, errors.New("invalid hash encoding")
 	}
 
 	// Generate hash using the same parameters and salt
-	hash := argon2.IDKey([]byte(password), salt, time, memory, threads, keyLen)
+	hash := argon2.IDKey([]byte(password), salt, t, m, p, keyLen)
 
 	// Compare the generated hash and stored hash
 	if !equalSlices(hash, expectedHash) {

@@ -96,7 +96,7 @@ func (h *Handler) SignIn(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":  false,
 			"message": "error.code",
-			"error":   err,
+			"error":   err.Error(),
 		})
 	}
 
