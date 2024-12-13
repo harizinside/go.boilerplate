@@ -6,6 +6,7 @@ import (
 
 	"go.boilerplate/api"
 	"go.boilerplate/internal/config"
+	"go.boilerplate/internal/middleware"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
@@ -38,19 +39,19 @@ func main() {
 
 	app := config.FiberConfig()
 
-	app.Use(config.RecoverConfig())
+	app.Use(middleware.RecoverConfig())
 
-	app.Use(config.RequestIDConfig())
+	app.Use(middleware.RequestIDConfig())
 
-	app.Use(config.LoggerConfig())
+	app.Use(middleware.LoggerConfig())
 
-	app.Use(config.LimiterConfig())
+	app.Use(middleware.LimiterConfig())
 
-	app.Use(config.CompressConfig())
+	app.Use(middleware.CompressConfig())
 
-	app.Use(config.CorsConfig())
+	app.Use(middleware.CorsConfig())
 
-	app.Use(config.HelmetConfig())
+	app.Use(middleware.HelmetConfig())
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Welcome Golang on Fiber")
