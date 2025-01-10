@@ -41,6 +41,8 @@ func main() {
 
 	app.Use(middleware.RecoverConfig())
 
+	app.Use(middleware.CacheConfig())
+
 	app.Use(middleware.RequestIDConfig())
 
 	app.Use(middleware.LoggerConfig())
@@ -52,6 +54,10 @@ func main() {
 	app.Use(middleware.CorsConfig())
 
 	app.Use(middleware.HelmetConfig())
+
+	app.Use(middleware.ETagConfig())
+
+	app.Use(middleware.FileSystemConfig())
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Welcome Golang on Fiber")
